@@ -733,10 +733,13 @@ async def product_position_edit_items(call: CallbackQuery, state: FSMContext):
         save_items = "\n".join(save_items)
 
         save_items = await upload_text(call, save_items)
-        await call.message.answer(f"<b>📥 Все товары позиции: <code>{get_position['position_name']}</code>\n"
-                                  f"🔗 Ссылка: <a href='{save_items}'>кликабельно</a></b>",
-                                  reply_markup=close_inl)
-        await call.answer()
+        if save_items:
+            await call.message.answer(f"<b>📥 Все товары позиции: <code>{get_position['position_name']}</code>\n"
+                                      f"🔗 Ссылка: <a href='{save_items}'>кликабельно</a></b>",
+                                      reply_markup=close_inl)
+            await call.answer()
+        else:
+            await call.message.answer("<b>🚫 Ошибка:</b> Request Entity Too Large", reply_markup=close_inl)
     else:
         await call.answer("❕ В данной позиции отсутствуют товары", True)
 

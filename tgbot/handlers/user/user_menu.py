@@ -1,12 +1,14 @@
 # - *- coding: utf- 8 - *-
+import os
 import asyncio
+import aiofiles
 from contextlib import suppress
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.exceptions import MessageCantBeDeleted
+from aiogram.utils.exceptions import MessageCantBeDeleted, MessageIsTooLong
 
-from tgbot.data.config import BOT_DESCRIPTION
+from tgbot.data.config import BOT_DESCRIPTION, PATH_CHECKS
 from tgbot.data.loader import dp
 from tgbot.keyboards.inline_main import profile_open_inl
 from tgbot.keyboards.inline_page import *
@@ -413,8 +415,19 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                     await call.message.delete()
 
                 for item in split_messages(save_items, save_len):
-                    await call.message.answer("\n\n".join(item), parse_mode="None")
-                    await asyncio.sleep(0.3)
+                    try:
+                        await call.message.answer("\n\n".join(item), parse_mode="None")
+                        await asyncio.sleep(0.3)
+                    except MessageIsTooLong:
+                        async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
+                            await file.write("\n\n".join(item) + "\n")
+
+                try:
+                    with open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
+                        await call.message.answer_document(document)
+                    os.remove(PATH_CHECKS + str(receipt) + ".txt")   # удаляем файл чека
+                except FileNotFoundError:
+                    pass
 
                 await call.message.answer(
                     ded(f"""

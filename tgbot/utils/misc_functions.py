@@ -131,7 +131,7 @@ def get_faq(user_id: Union[int, str], send_message: str) -> str:
 
 
 # Загрузка текста на текстовый хостинг
-async def upload_text(dp, get_text) -> str:
+async def upload_text(dp, get_text) -> (str or bool):
     rSession: AsyncSession = dp.bot['rSession']
     session = await rSession.get_session()
 
@@ -155,6 +155,8 @@ async def upload_text(dp, get_text) -> str:
             json={"language": "text", "title": "", "snippet": get_text},
         )
 
+        if response.status == 413:  # Request Entity Too Large
+            return False
         get_link = json.loads((await response.read()).decode())['url']
 
     return get_link

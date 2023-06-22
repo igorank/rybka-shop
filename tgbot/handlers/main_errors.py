@@ -1,4 +1,5 @@
 # - *- coding: utf- 8 - *-
+import traceback
 from aiogram.types import Update
 
 from tgbot.data.loader import dp
@@ -62,6 +63,7 @@ async def main_errors(update: Update, exception):
     #                   f"Update: <code>{update}</code></b>")
 
     print(f"-Exception | {exception}")
+    print(f"The line where the code failed was:\n{str(traceback.format_exc())}")
     bot_logger.exception(
         f"Exception: {exception}\n"
         f"Update: {update}"

@@ -1,0 +1,12 @@
+.idea/
+venv/
+tgbot/__pycache__/
+tgbot/data/__pycache__/
+tgbot/handlers/__pycache__/
+tgbot/handlers/admin/__pycache__/
+tgbot/handlers/user/__pycache__/
+tgbot/keyboards/__pycache__/
+tgbot/middlewares/__pycache__/
+tgbot/services/__pycache__/
+tgbot/utils/__pycache__/
+tgbot/utils/misc/__pycache__/
