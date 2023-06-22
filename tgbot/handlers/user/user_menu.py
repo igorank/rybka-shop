@@ -415,19 +415,12 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                     await call.message.delete()
 
                 for item in split_messages(save_items, save_len):
-                    try:
-                        await call.message.answer("\n\n".join(item), parse_mode="None")
-                        await asyncio.sleep(0.3)
-                    except MessageIsTooLong:
-                        async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
-                            await file.write("\n\n".join(item) + "\n")
+                    async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
+                        await file.write("\n".join(item) + "\n")
 
-                try:
-                    with open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
-                        await call.message.answer_document(document)
-                    os.remove(PATH_CHECKS + str(receipt) + ".txt")   # удаляем файл чека
-                except FileNotFoundError:
-                    pass
+                with open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
+                    await call.message.answer_document(document)
+                os.remove(PATH_CHECKS + str(receipt) + ".txt")   # удаляем файл чека
 
                 await call.message.answer(
                     ded(f"""
