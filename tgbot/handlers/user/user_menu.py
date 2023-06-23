@@ -1,12 +1,12 @@
 # - *- coding: utf- 8 - *-
-import os
 import asyncio
 import aiofiles
+import aiofiles.os
 from contextlib import suppress
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.exceptions import MessageCantBeDeleted, MessageIsTooLong
+from aiogram.utils.exceptions import MessageCantBeDeleted  # MessageIsTooLong
 
 from tgbot.data.config import BOT_DESCRIPTION, PATH_CHECKS
 from tgbot.data.loader import dp
@@ -418,9 +418,9 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                     async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
                         await file.write("\n".join(item) + "\n")
 
-                with open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
+                async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
                     await call.message.answer_document(document)
-                os.remove(PATH_CHECKS + str(receipt) + ".txt")   # удаляем файл чека
+                await aiofiles.os.remove(PATH_CHECKS + str(receipt) + ".txt")  # удаляем файл чека
 
                 await call.message.answer(
                     ded(f"""
