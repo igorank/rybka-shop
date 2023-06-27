@@ -414,8 +414,8 @@ async def user_purchase_confirm(call: CallbackQuery, state: FSMContext):
                 with suppress(MessageCantBeDeleted):
                     await call.message.delete()
 
-                for item in split_messages(save_items, save_len):
-                    async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
+                async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "a") as file:
+                    for item in split_messages(save_items, save_len):
                         await file.write("\n".join(item) + "\n")
 
                 async with aiofiles.open(PATH_CHECKS + str(receipt) + ".txt", "rb") as document:
