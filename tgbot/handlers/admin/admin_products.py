@@ -1,4 +1,6 @@
 # - *- coding: utf- 8 - *-
+import io
+import aiofiles
 from contextlib import suppress
 
 from aiogram.dispatcher import FSMContext
@@ -919,10 +921,10 @@ async def product_item_position_open(call: CallbackQuery, state: FSMContext):
 
     await state.set_state("here_add_items")
     await call.message.answer(
-        "<b>📤 Отправьте данные товаров.</b>\n"
-        "❗ Товары разделяются одной пустой строчкой. Пример:\n"
-        "<code>Данные товара...\n\n"
-        "Данные товара...\n\n"
+        "<b>📤 Загрузите файл, содержащий данные товаров.</b>\n"
+        "❗ Каждый товар должен находиться в одной строке. Пример:\n"
+        "<code>Данные товара...\n"
+        "Данные товара...\n"
         "Данные товара...</code>",
         reply_markup=finish_load_rep,
     )
@@ -949,14 +951,20 @@ async def product_item_load_finish(message: Message, state: FSMContext):
 
 # Принятие данных товара
 @rate_limit(0)
-@dp.message_handler(IsAdmin(), state="here_add_items")
+@dp.message_handler(IsAdmin(), content_types="document", state="here_add_items")
 async def product_item_load_get(message: Message, state: FSMContext):
     cache_msg = await message.answer("<b>⌛ Ждите, товары добавляются...</b>")
 
-    count_add = 0
-    get_all_items = clear_list(message.text.split("\n\n"))
+    file_path = (await message.bot.get_file(message.document.file_id)).file_path
+    document: io.BytesIO = await message.bot.download_file(file_path)
 
-    for check_item in get_all_items:
+    with document as file:
+        get_all_items = file.readlines()
+
+    decoded_items = [item.decode("utf-8") for item in get_all_items]    # Decode the bytes object to produce a string
+
+    count_add = 0
+    for check_item in decoded_items:
         if not check_item.isspace() and check_item != "": count_add += 1
 
     async with state.proxy() as data:
@@ -965,7 +973,7 @@ async def product_item_load_get(message: Message, state: FSMContext):
         data['here_count_add_items'] += count_add
 
     get_user = get_userx(user_id=message.from_user.id)
-    add_itemx(category_id, position_id, get_all_items, get_user['user_id'], get_user['user_name'])
+    add_itemx(category_id, position_id, decoded_items, get_user['user_id'], get_user['user_name'])
 
     await cache_msg.edit_text(f"<b>📥 Товары в кол-ве</b> <u>{count_add}шт</u> <b>были успешно добавлены ✅</b>")
 
