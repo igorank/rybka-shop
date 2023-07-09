@@ -25,7 +25,7 @@ async def scheduler_start(rSession):
     scheduler.add_job(update_profit_day, trigger="cron", hour=00)
     scheduler.add_job(update_profit_week, trigger="cron", day_of_week="mon", hour=00, minute=1)
     scheduler.add_job(autobackup_admin, trigger="cron", hour=00)
-    scheduler.add_job(check_update, trigger="cron", hour=00, args=(rSession,))
+    # scheduler.add_job(check_update, trigger="cron", hour=00, args=(rSession,))
     scheduler.add_job(check_mail, trigger="cron", hour=12, args=(rSession,))
 
 
@@ -45,6 +45,7 @@ async def on_startup(dp: Dispatcher):
     bot_logger.warning("BOT WAS STARTED")
     print(colorama.Fore.LIGHTYELLOW_EX + f"~~~~~ Bot was started - @{(await dp.bot.get_me()).username} ~~~~~")
     print(colorama.Fore.LIGHTBLUE_EX + "~~~~~ TG developer - @djimbox ~~~~~")
+    print(colorama.Fore.LIGHTRED_EX + "~~~~~ Improved by - github.com/igorank ~~~~~")
     print(colorama.Fore.RESET)
 
     if len(get_admins()) == 0: print("***** ENTER ADMIN ID IN settings.ini *****")
